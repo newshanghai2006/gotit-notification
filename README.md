@@ -40,6 +40,18 @@ npm install
 npx wrangler login
 ```
 
+For the first local test, you do not need to create remote Cloudflare resources yet. Open a second terminal in `worker`, initialize the local D1 database, and keep the Worker running:
+
+```powershell
+npm install
+npx wrangler d1 execute gotit --local --file=schema.sql
+npm run dev
+```
+
+The Worker will listen on `http://0.0.0.0:8787`. Put the computer's reachable Wi-Fi IPv4 address in the project `.env`, for example `EXPO_PUBLIC_API_URL=http://192.168.137.1:8787`. Keep this terminal open while testing the app. In another terminal, start Expo with `npm run start`.
+
+If `ipconfig` shows several IPv4 addresses, use the address on the same Wi-Fi or hotspot network as the phone. After changing `.env`, stop Expo and restart it with `npx expo start --clear --max-workers 1`.
+
 Create the two free storage resources:
 
 ```powershell

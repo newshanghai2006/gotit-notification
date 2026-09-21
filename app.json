@@ -7,8 +7,24 @@
     "userInterfaceStyle": "light",
     "icon": "./app-icon.png",
     "scheme": "gotit",
-    "plugins": ["expo-notifications"],
-    "android": { "package": "com.gotit.app", "adaptiveIcon": { "foregroundImage": "./app-icon.png", "backgroundColor": "#F7FAF9" } },
-    "ios": { "bundleIdentifier": "com.gotit.app" }
+    "plugins": [
+      "expo-notifications"
+    ],
+    "android": {
+      "package": "com.gotit.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./app-icon.png",
+        "backgroundColor": "#F7FAF9"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.gotit.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c5d7be52-6d73-451e-b727-5a391aa4518c"
+      }
+    },
+    "owner": "patrickgmailcoms-team"
   }
 }
