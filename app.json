@@ -13,8 +13,8 @@
     "android": {
       "package": "com.gotit.app",
       "adaptiveIcon": {
-        "foregroundImage": "./app-icon.png",
-        "backgroundColor": "#F7FAF9"
+        "foregroundImage": "./app-icon-foreground.png",
+        "backgroundColor": "#050A65"
       }
     },
     "ios": {

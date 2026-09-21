@@ -52,8 +52,11 @@ async function sendEmail(env: Env, email: string, code: string) {
 
 async function pushToDevices(env: Env, userId: string, title: string, body: string) {
   const rows = await env.DB.prepare('SELECT push_token FROM devices WHERE user_id = ?').bind(userId).all<{ push_token: string }>();
-  if (!rows.results.length) return;
-  await fetch('https://exp.host/--/api/v2/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(env.EXPO_ACCESS_TOKEN ? { Authorization: `Bearer ${env.EXPO_ACCESS_TOKEN}` } : {}) }, body: JSON.stringify(rows.results.map((row) => ({ to: row.push_token, title, body, sound: 'default' }))) });
+  if (!rows.results.length) return { registeredDevices: 0, tickets: [] };
+  const result = await fetch('https://exp.host/--/api/v2/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(env.EXPO_ACCESS_TOKEN ? { Authorization: `Bearer ${env.EXPO_ACCESS_TOKEN}` } : {}) }, body: JSON.stringify(rows.results.map((row) => ({ to: row.push_token, title, body, sound: 'default', channelId: 'default' }))) });
+  const payload = await result.json().catch(() => ({ error: 'Invalid response from Expo push service' }));
+  if (!result.ok) return { registeredDevices: rows.results.length, error: `Expo push HTTP ${result.status}`, details: payload };
+  return { registeredDevices: rows.results.length, tickets: payload };
 }
 
 async function route(request: Request, env: Env): Promise<Response> {
@@ -88,8 +91,9 @@ async function route(request: Request, env: Env): Promise<Response> {
     } else userId = (await env.DB.prepare('SELECT user_id FROM api_tokens WHERE token_hash = ? AND revoked = 0').bind(await hash(supplied)).first<{ user_id: string }>())?.user_id;
     if (!userId) return response({ error: 'Invalid API token or user' }, 401, env);
     const message = { id: id(), userId, title: input.title, sender: input.sender ?? 'API', body: input.body, createdAt: new Date().toISOString() };
-    await env.DB.prepare('INSERT INTO messages(id,user_id,title,sender,body,created_at) VALUES(?,?,?,?,?,?)').bind(message.id, message.userId, message.title, message.sender, message.body, message.createdAt).run(); await pushToDevices(env, userId, message.title, message.body);
-    return response({ message }, 201, env);
+    await env.DB.prepare('INSERT INTO messages(id,user_id,title,sender,body,created_at) VALUES(?,?,?,?,?,?)').bind(message.id, message.userId, message.title, message.sender, message.body, message.createdAt).run();
+    const push = await pushToDevices(env, userId, message.title, message.body);
+    return response({ message, push }, 201, env);
   }
   const user = await findUser(request, env); if (!user) return response({ error: 'Not authenticated' }, 401, env);
   if (path === '/me/api-token' && request.method === 'POST') {

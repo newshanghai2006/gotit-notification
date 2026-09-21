@@ -161,6 +161,19 @@ npx expo start --dev-client --max-workers 1
 
 EAS 会自动生成和管理 Android keystore，不需要购买签名证书。应用图标使用根目录的 `app-icon.png`。
 
+## 修改后需要执行什么
+
+| 修改内容 | 需要执行的命令 |
+|---|---|
+| `worker/src`、Worker 配置或服务端逻辑 | `cd worker` 后执行 `npm run deploy` |
+| `worker/schema.sql` | 执行 `npx wrangler d1 execute gotit --remote --file=schema.sql`，如同时修改 Worker 再执行 `npm run deploy` |
+| `App.tsx`、`src`、`app.json`、图标或客户端依赖 | 重新执行 `npx eas-cli@latest build --platform android --profile preview` 并安装新 APK |
+| 只修改本地 `.env` | Expo 调试时重启 `npx expo start --clear --max-workers 1`；已生成的 APK 不会自动更新 |
+| 修改 EAS 环境变量 | 重新执行 EAS build，变量会在构建时写入 App |
+| 修改 README | 不需要部署或重新构建 |
+
+`wrangler deploy` 只更新 Cloudflare Worker，不会更新手机里的 App；EAS build 只更新客户端，不会部署 Worker。
+
 ## GitHub 提交前检查
 
 - 不提交根目录 `.env`。
