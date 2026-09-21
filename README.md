@@ -20,6 +20,16 @@ npm run start
 
 The start script uses one Metro worker to avoid the `DataCloneError: Data cannot be cloned, out of memory` failure on some Windows/Node installations. The same option was verified with an Android export.
 
+Expo Go can test login, the inbox, reading, deleting, and API messages. Expo Go cannot provide Android remote push notifications because `expo-notifications` was removed from Expo Go starting with SDK 53. The app now skips notification registration when it detects Expo Go, so this warning should not block the rest of the app. For real push testing, build a development client:
+
+```powershell
+npx eas login
+npx eas build -p android --profile development
+npx expo start --dev-client --max-workers 1
+```
+
+Install the generated development APK on the phone, then open the project with that app instead of Expo Go.
+
 ## 2. Configure Cloudflare
 
 Install and log in to Wrangler:
@@ -98,4 +108,38 @@ npx eas build:configure
 npx eas build -p android --profile preview
 ```
 
-The preview profile should use `android.buildType = "apk"`; the finished APK is available from the EAS build page. A production Play Store build should use an Android App Bundle (`.aab`) instead. An APK cannot be produced here until an Expo/EAS account and Android signing credentials are available.
+The preview profile should use `android.buildType = "apk"`; the finished APK is available from the EAS build page. A production Play Store build should use an Android App Bundle (`.aab`) instead.
+
+## 6. Expo/EAS accounts, signing, and fees
+
+An Expo account is free. Create one at `https://expo.dev/signup`, then log in from the project directory:
+
+```powershell
+npx eas-cli@latest login
+npx eas-cli@latest whoami
+```
+
+The current EAS Free plan is `$0/month` and includes up to 15 Android builds and 15 iOS builds per month, with a low-priority queue. It is enough for initial testing and small projects. Paid plans are only needed for higher build quotas, faster queues, or larger teams; the pricing page currently lists Starter at `$19/month` plus usage. EAS may still require account verification, but a paid subscription is not required for the first free quota.
+
+For Android signing, EAS can generate and manage the keystore automatically. During the first build, answer yes when EAS asks to create Android credentials. You do not need to buy an Android certificate. The keystore is private and must never be committed to the repository. Inspect or manage it with:
+
+```powershell
+npx eas-cli@latest credentials -p android
+```
+
+There are two separate costs to understand:
+
+- Installing an APK directly on a phone: no Google Play account and no Google fee are required.
+- Publishing on Google Play: a Google Play Console developer registration is required. Google currently charges a one-time `$25 USD` registration fee; Google may also require identity verification.
+
+iOS will require an Apple Developer Program membership when we build or publish the iOS app. Apple currently charges `$99 USD/year` in most regions. EAS can manage iOS certificates and provisioning profiles after the Apple membership is connected, but it cannot replace that membership.
+
+Recommended first APK flow:
+
+```powershell
+npx eas-cli@latest login
+npx eas-cli@latest build:configure
+npx eas-cli@latest build -p android --profile preview
+```
+
+The `preview` profile produces an installable APK. The `development` profile produces an APK containing the development client, which is needed for testing Android push notifications. The `production` profile is configured for a Play Store `.aab`.
