@@ -80,3 +80,13 @@ npx eas-cli@latest build -p android --profile preview
 ```
 
 The preview profile generates an installable APK. The development profile generates a development client needed for Android push testing. EAS can generate and manage the Android keystore automatically.
+
+## Android push and Firebase
+
+Android remote push requires Firebase configuration in addition to an APK build. Create a Firebase Android app with package name `com.gotit.app`, download `google-services.json`, and upload it to the EAS environment as a Secret File:
+
+```powershell
+npx eas-cli@latest env:set --name GOOGLE_SERVICES_JSON --value .\google-services.json --type file --visibility secret --environment preview
+```
+
+Then generate an FCM V1 service-account key in Firebase Console and upload it through `npx eas-cli@latest credentials --platform android` under Push Notifications / FCM V1 credentials. Never commit either JSON credential file. Rebuild and reinstall the preview APK after configuration.

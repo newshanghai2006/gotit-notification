@@ -104,6 +104,15 @@ async function route(request: Request, env: Env): Promise<Response> {
     const rows = await env.DB.prepare('SELECT id,title,sender,body,created_at,read FROM messages WHERE user_id = ? ORDER BY created_at DESC').bind(user.id).all<MessageRow>();
     return response({ messages: rows.results.map((row) => ({ id: row.id, title: row.title, sender: row.sender, body: row.body, createdAt: row.created_at, read: Boolean(row.read) })) }, 200, env);
   }
+  if (path === '/messages/bulk-delete' && request.method === 'POST') {
+    let input: { ids?: string[] };
+    try { input = await request.json<{ ids?: string[] }>(); } catch { return response({ error: 'Request body must be valid JSON' }, 400, env); }
+    const ids = [...new Set(input.ids?.filter((value) => typeof value === 'string' && value.length > 0) ?? [])].slice(0, 100);
+    if (!ids.length) return response({ error: 'At least one message id is required' }, 400, env);
+    const placeholders = ids.map(() => '?').join(',');
+    const result = await env.DB.prepare(`DELETE FROM messages WHERE user_id = ? AND id IN (${placeholders})`).bind(user.id, ...ids).run();
+    return response({ ok: true, deleted: result.meta.changes }, 200, env);
+  }
   const messageMatch = path.match(/^\/messages\/([^/]+)(?:\/(read))?$/);
   if (messageMatch) {
     const messageId = messageMatch[1]; const owned = await env.DB.prepare('SELECT id FROM messages WHERE id = ? AND user_id = ?').bind(messageId, user.id).first();

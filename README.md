@@ -161,6 +161,60 @@ npx expo start --dev-client --max-workers 1
 
 EAS 会自动生成和管理 Android keystore，不需要购买签名证书。应用图标使用根目录的 `app-icon.png`。
 
+## Android 推送所需的 Firebase/FCM 配置
+
+只构建 APK 不会自动获得 Android 推送能力。远程 D1 的 `devices` 表为 `0` 时，通常表示 APK 没有配置 Firebase，无法注册 Expo Push Token。
+
+### 1. 创建 Firebase Android 应用
+
+1. 打开 [Firebase Console](https://console.firebase.google.com/) 并创建项目。
+2. 在项目中添加 Android 应用。
+3. Android package name 必须填写 `com.gotit.app`，与 `app.json` 完全一致。
+4. 下载 `google-services.json` 到项目根目录。
+
+该文件已被 `.gitignore` 排除，不会提交到 GitHub。
+
+### 2. 将 Firebase 配置作为 EAS Secret File
+
+为独立 APK 的 `preview` 环境上传：
+
+```powershell
+npx eas-cli@latest env:set --name GOOGLE_SERVICES_JSON --value .\google-services.json --type file --visibility secret --environment preview
+```
+
+以后构建 production AAB 时还要为 production 环境上传：
+
+```powershell
+npx eas-cli@latest env:set --name GOOGLE_SERVICES_JSON --value .\google-services.json --type file --visibility secret --environment production
+```
+
+`app.config.js` 会在云构建期间把这个 Secret File 传给 Android 配置。
+
+### 3. 上传 FCM V1 服务账号到 EAS
+
+1. Firebase Console 打开 **项目设置 → 服务账号**。
+2. 点击 **生成新的私钥**，下载服务账号 JSON。
+3. 执行 `npx eas-cli@latest credentials --platform android`。
+4. 选择 Android 构建配置，然后选择管理 Push Notifications / FCM V1 服务账号。
+5. 选择上传新的 Service Account Key，并提供刚下载的 JSON。
+
+服务账号 JSON 是高敏感凭据，不能提交到 GitHub。项目已忽略名称为 `firebase-service-account*.json` 的文件；上传完成后建议从电脑的普通下载目录移至安全位置。
+
+### 4. 重新构建并验证
+
+```powershell
+npx eas-cli@latest build --platform android --profile preview
+```
+
+卸载旧 APK，安装新 APK并登录，允许系统通知权限。然后检查：
+
+```powershell
+cd worker
+npx wrangler d1 execute gotit --remote --command "SELECT COUNT(*) AS device_count FROM devices;"
+```
+
+至少应该显示 `device_count: 1`。新版本在注册失败时会直接弹出“通知注册失败”和具体错误，不再静默忽略。
+
 ## 修改后需要执行什么
 
 | 修改内容 | 需要执行的命令 |

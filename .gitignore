@@ -9,4 +9,6 @@ credentials.json
 *.keystore
 *.p12
 *.mobileprovision
+google-services.json
+firebase-service-account*.json
 *.log
