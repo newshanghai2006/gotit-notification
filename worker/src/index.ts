@@ -3,6 +3,7 @@ export interface Env {
   OTP: KVNamespace;
   API_TOKEN?: string;
   RESEND_API_KEY?: string;
+  MAIL_FROM?: string;
   EXPO_ACCESS_TOKEN?: string;
   APP_ORIGIN?: string;
   DEV_AUTH_ENABLED?: string;
@@ -45,7 +46,8 @@ async function getOrCreateUser(email: string, env: Env) {
 
 async function sendEmail(env: Env, email: string, code: string) {
   if (!env.RESEND_API_KEY) return;
-  await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: 'Gotit <onboarding@resend.dev>', to: [email], subject: 'Gotit login code', text: `Your Gotit login code is ${code}. It expires in 10 minutes.` }) });
+  const result = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: env.MAIL_FROM ?? 'Gotit <onboarding@resend.dev>', to: [email], subject: 'Gotit login code', text: `Your Gotit login code is ${code}. It expires in 10 minutes.` }) });
+  if (!result.ok) throw new Error('Resend rejected the email request');
 }
 
 async function pushToDevices(env: Env, userId: string, title: string, body: string) {

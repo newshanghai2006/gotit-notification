@@ -42,7 +42,13 @@ npx wrangler d1 execute gotit --remote --file=schema.sql
 npx wrangler deploy
 ```
 
-Set `RESEND_API_KEY` for real email login, `EXPO_ACCESS_TOKEN` for Expo push delivery, and set `DEV_AUTH_ENABLED = "false"` before production deployment.
+For real email login, verify a sender domain in Resend, set `MAIL_FROM` in `worker/wrangler.toml`, and store the API key as a Worker secret:
+
+```powershell
+npx wrangler secret put RESEND_API_KEY
+```
+
+Set `DEV_AUTH_ENABLED = "false"` and `EXPO_PUBLIC_AUTH_MODE=email` before production deployment. Never commit API keys or mail credentials.
 
 ## User API tokens
 
