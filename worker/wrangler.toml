@@ -13,5 +13,5 @@ id = "6185375f512e4a51b056bdd26088139d"
 
 [vars]
 APP_ORIGIN = "*"
-DEV_AUTH_ENABLED = "true"
+DEV_AUTH_ENABLED = "false"
 # Set secrets with `wrangler secret put`: API_TOKEN, RESEND_API_KEY, MAIL_FROM, EXPO_ACCESS_TOKEN

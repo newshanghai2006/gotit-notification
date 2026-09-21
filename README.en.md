@@ -64,6 +64,15 @@ curl -X POST https://YOUR_WORKER.workers.dev/push `
 
 ## APK
 
+EAS cloud builds do not automatically use your local `.env`. Create the public client variables in the `preview` environment first:
+
+```powershell
+npx eas-cli@latest env:create --name EXPO_PUBLIC_API_URL --value https://gotit.4310212.xyz --environment preview --visibility plaintext
+npx eas-cli@latest env:create --name EXPO_PUBLIC_AUTH_MODE --value dev --environment preview --visibility plaintext
+```
+
+Use `email` instead of `dev` after Resend is configured. These variables are embedded in the app and are not secrets. Keep `RESEND_API_KEY` only in the Cloudflare Worker secret store.
+
 ```powershell
 npx eas-cli@latest login
 npx eas-cli@latest init --id YOUR_EXPO_PROJECT_ID
