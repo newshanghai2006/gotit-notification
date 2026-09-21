@@ -111,6 +111,14 @@ npx expo start --clear --max-workers 1
 
 使用 Token 推送消息：
 
+Windows CMD 使用双引号并转义 JSON 内部双引号：
+
+```cmd
+curl.exe -X POST "https://gotit.4310212.xyz/push" -H "X-API-Token: gotit_USER_TOKEN" -H "Content-Type: application/json" -d "{\"title\":\"订单提醒\",\"sender\":\"订单系统\",\"body\":\"你的订单已发货。\"}"
+```
+
+PowerShell 可以使用单引号包住 JSON：
+
 ```powershell
 curl -X POST https://gotit.4310212.xyz/push `
   -H "X-API-Token: gotit_USER_TOKEN" `

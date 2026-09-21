@@ -77,7 +77,9 @@ async function route(request: Request, env: Env): Promise<Response> {
     const user = await getOrCreateUser(normalized, env); await env.OTP.delete(`otp:${normalized}`); return response({ token: sessionToken(user.id), user }, 200, env);
   }
   if (path === '/push' && request.method === 'POST') {
-    const supplied = request.headers.get('X-API-Token'); const input = await request.json<{ email?: string; title?: string; sender?: string; body?: string }>();
+    const supplied = request.headers.get('X-API-Token');
+    let input: { email?: string; title?: string; sender?: string; body?: string };
+    try { input = await request.json<{ email?: string; title?: string; sender?: string; body?: string }>(); } catch { return response({ error: 'Request body must be valid JSON' }, 400, env); }
     if (!supplied || !input.title || !input.body) return response({ error: 'X-API-Token, title and body are required' }, 400, env);
     let userId: string | undefined;
     if (env.API_TOKEN && supplied === env.API_TOKEN) {
