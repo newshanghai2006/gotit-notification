@@ -5,11 +5,11 @@ compatibility_date = "2025-05-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "gotit"
-database_id = "replace-with-d1-database-id"
+database_id = "7d766635-59d0-44d3-bcd4-7c0802234e56"
 
 [[kv_namespaces]]
 binding = "OTP"
-id = "replace-with-kv-namespace-id"
+id = "6185375f512e4a51b056bdd26088139d"
 
 [vars]
 APP_ORIGIN = "*"
