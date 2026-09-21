@@ -65,19 +65,14 @@ Gotit <noreply@mail.example.com>
 
 ### 3. 配置 Worker
 
-在 `worker/wrangler.toml` 设置已验证域名的发件地址：
-
-```toml
-MAIL_FROM = "Gotit <noreply@mail.example.com>"
-```
-
-然后把 API Key 保存为 Cloudflare Secret：
+不要把个人发件地址写入会提交到 GitHub 的 `wrangler.toml`。将发件地址也保存为 Cloudflare Secret：
 
 ```powershell
+npx wrangler secret put MAIL_FROM
 npx wrangler secret put RESEND_API_KEY
 ```
 
-按提示粘贴 API Key。不要把 API Key 写入 `wrangler.toml`。
+分别按提示输入发件地址（例如 `Gotit <noreply@mail.example.com>`）和 Resend API Key。不要把它们写入 `wrangler.toml`。
 
 ### 4. 开启真实邮箱登录
 
@@ -148,3 +143,11 @@ npx expo start --dev-client --max-workers 1
 ```
 
 EAS 会自动生成和管理 Android keystore，不需要购买签名证书。应用图标使用根目录的 `app-icon.png`。
+
+## GitHub 提交前检查
+
+- 不提交根目录 `.env`。
+- 不提交 `worker/.dev.vars`；只提交 `worker/.dev.vars.example`。
+- `RESEND_API_KEY`、`MAIL_FROM`、`API_TOKEN` 和 `EXPO_ACCESS_TOKEN` 只使用 `wrangler secret put` 保存。
+- D1/KV 的 ID、Worker URL 和应用包名不是密码，但仍应只在需要时公开。
+- 如果任何 API Key、邮箱密码或签名文件意外进入 Git 历史，应立即撤销并重新生成，单纯删除当前文件不够。

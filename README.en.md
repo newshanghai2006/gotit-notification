@@ -42,9 +42,10 @@ npx wrangler d1 execute gotit --remote --file=schema.sql
 npx wrangler deploy
 ```
 
-For real email login, verify a sender domain in Resend, set `MAIL_FROM` in `worker/wrangler.toml`, and store the API key as a Worker secret:
+For real email login, verify a sender domain in Resend, store the sender address and API key as Worker secrets, and never put either value in the public `wrangler.toml`:
 
 ```powershell
+npx wrangler secret put MAIL_FROM
 npx wrangler secret put RESEND_API_KEY
 ```
 

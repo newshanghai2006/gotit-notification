@@ -4,4 +4,9 @@ dist/
 .env
 *.dev.vars
 worker/.dev.vars
+credentials.json
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
 *.log

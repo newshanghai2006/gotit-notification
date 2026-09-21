@@ -14,6 +14,4 @@ id = "6185375f512e4a51b056bdd26088139d"
 [vars]
 APP_ORIGIN = "*"
 DEV_AUTH_ENABLED = "true"
-# Set secrets with `wrangler secret put`: API_TOKEN, RESEND_API_KEY, EXPO_ACCESS_TOKEN
-# After verifying a sender domain in Resend, set MAIL_FROM to e.g. "Gotit <noreply@example.com>".
-MAIL_FROM = "Gotit <onboarding@resend.dev>"
+# Set secrets with `wrangler secret put`: API_TOKEN, RESEND_API_KEY, MAIL_FROM, EXPO_ACCESS_TOKEN
