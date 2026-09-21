@@ -125,8 +125,8 @@ curl -X POST https://gotit.4310212.xyz/push `
 EAS 云构建不会自动使用本机 `.env` 中的变量。先把客户端需要的公开变量写入 EAS 的 `preview` 环境：
 
 ```powershell
-npx eas-cli@latest env:create --name EXPO_PUBLIC_API_URL --value https://gotit.4310212.xyz --environment preview --visibility plaintext
-npx eas-cli@latest env:create --name EXPO_PUBLIC_AUTH_MODE --value dev --environment preview --visibility plaintext
+npx eas-cli@latest env:set --name EXPO_PUBLIC_API_URL --value https://gotit.4310212.xyz --environment preview --visibility plaintext
+npx eas-cli@latest env:set --name EXPO_PUBLIC_AUTH_MODE --value dev --environment preview --visibility plaintext
 ```
 
 如果已经配置 Resend 并准备测试正式邮箱登录，把第二个值改成 `email`。这两个变量会被编译进 App，不是密码；Resend API Key 仍然只放在 Cloudflare Worker Secret 中。
