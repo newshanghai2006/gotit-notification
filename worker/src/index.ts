@@ -12,7 +12,8 @@ type User = { id: string; email: string };
 type MessageRow = { id: string; title: string; sender: string; body: string; created_at: string; read: number };
 
 const id = () => crypto.randomUUID();
-const sessionToken = (userId: string) => btoa(`${userId}.${crypto.randomUUID()}`);
+const SESSION_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+const sessionToken = (userId: string) => btoa(`${userId}.${Date.now() + SESSION_TTL_MS}.${crypto.randomUUID()}`);
 const apiToken = () => `gotit_${crypto.randomUUID().replaceAll('-', '')}`;
 
 async function hash(value: string) {
@@ -28,7 +29,11 @@ function response(body: unknown, status: number, env: Env) {
 async function findUser(request: Request, env: Env): Promise<User | null> {
   const value = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
   if (!value) return null;
-  try { return await env.DB.prepare('SELECT id, email FROM users WHERE id = ?').bind(atob(value).split('.')[0]).first<User>(); } catch { return null; }
+  try {
+    const parts = atob(value).split('.');
+    if (parts[1] && Number(parts[1]) && Date.now() > Number(parts[1])) return null;
+    return await env.DB.prepare('SELECT id, email FROM users WHERE id = ?').bind(parts[0]).first<User>();
+  } catch { return null; }
 }
 
 async function getOrCreateUser(email: string, env: Env) {

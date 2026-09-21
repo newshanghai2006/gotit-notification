@@ -58,7 +58,7 @@ npx wrangler deploy
 部署后，把项目根目录 `.env` 改成：
 
 ```env
-EXPO_PUBLIC_API_URL=https://你的-worker域名.workers.dev
+EXPO_PUBLIC_API_URL=https://gotit.4310212.xyz
 EXPO_PUBLIC_AUTH_MODE=dev
 ```
 
@@ -86,6 +86,8 @@ EXPO_PUBLIC_AUTH_MODE=email
 
 Resend 需要配置可用的发件域名，否则不会真正发送邮件。
 
+注意：Cloudflare Worker 不能直接连接 `smtp.163.com:465` 这类原始 SMTP TCP 服务，因此不能仅把 163 的 SMTP 参数写入 Worker 就发送邮件。当前 Worker 使用 Resend 的 HTTP API；如果必须使用 163 SMTP，需要另行部署一个支持 SMTP 的邮件中转服务，再由 Worker 通过 HTTPS 调用。你在聊天中发送过 163 邮箱密码，建议立即在 163 邮箱后台撤销/更换该密码，不要把密码写入代码、`.env` 或 Git。
+
 ## 四、用户 API Token
 
 登录后点击收件箱右上角的 `API`：
@@ -95,6 +97,8 @@ Resend 需要配置可用的发件域名，否则不会真正发送邮件。
 3. 弹窗只显示这一次
 4. 点击“复制 Token”保存到剪贴板
 5. D1 只保存 Token 哈希
+
+登录会话 Token 的有效期为 1 年，并保存在手机本地存储中；只要用户不清除 App 数据、不卸载 App，通常不需要重复登录。清除数据、卸载重装或 Token 过期后需要重新登录。
 
 使用用户 Token 推送消息时不需要填写邮箱：
 
