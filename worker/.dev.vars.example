@@ -1,0 +1,4 @@
+# 复制为 .dev.vars 后用于本地 Worker；生产环境使用 wrangler secret put
+API_TOKEN=change-me
+RESEND_API_KEY=
+EXPO_ACCESS_TOKEN=

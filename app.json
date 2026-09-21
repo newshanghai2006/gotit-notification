@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Gotit",
+    "slug": "gotit",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./app-icon.png",
+    "scheme": "gotit",
+    "plugins": ["expo-notifications"],
+    "android": { "package": "com.gotit.app", "adaptiveIcon": { "foregroundImage": "./app-icon.png", "backgroundColor": "#F7FAF9" } },
+    "ios": { "bundleIdentifier": "com.gotit.app" }
+  }
+}
