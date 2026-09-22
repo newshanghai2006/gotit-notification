@@ -198,6 +198,8 @@ npx eas-cli@latest env:set --name GOOGLE_SERVICES_JSON --value .\google-services
 4. 选择 Android 构建配置，然后选择管理 Push Notifications / FCM V1 服务账号。
 5. 选择上传新的 Service Account Key，并提供刚下载的 JSON。
 
+如果 `/push` 返回 `InvalidCredentials` 或 `Unable to retrieve the FCM server key`，说明手机 Token 已注册，但这份 FCM V1 服务账号尚未上传到 EAS。上传凭据后不需要重新构建 APK，也不需要重新部署 Worker，直接再次调用 `/push` 即可。
+
 服务账号 JSON 是高敏感凭据，不能提交到 GitHub。项目已忽略名称为 `firebase-service-account*.json` 的文件；上传完成后建议从电脑的普通下载目录移至安全位置。
 
 ### 4. 重新构建并验证

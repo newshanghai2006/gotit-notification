@@ -11,4 +11,5 @@ credentials.json
 *.mobileprovision
 google-services.json
 firebase-service-account*.json
+*-firebase-adminsdk-*.json
 *.log
