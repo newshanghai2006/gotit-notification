@@ -53,7 +53,7 @@ async function sendEmail(env: Env, email: string, code: string) {
 async function pushToDevices(env: Env, userId: string, title: string, body: string) {
   const rows = await env.DB.prepare('SELECT push_token FROM devices WHERE user_id = ?').bind(userId).all<{ push_token: string }>();
   if (!rows.results.length) return { registeredDevices: 0, tickets: [] };
-  const result = await fetch('https://exp.host/--/api/v2/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(env.EXPO_ACCESS_TOKEN ? { Authorization: `Bearer ${env.EXPO_ACCESS_TOKEN}` } : {}) }, body: JSON.stringify(rows.results.map((row) => ({ to: row.push_token, title, body, sound: 'default', channelId: 'default' }))) });
+  const result = await fetch('https://exp.host/--/api/v2/push/send', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(env.EXPO_ACCESS_TOKEN ? { Authorization: `Bearer ${env.EXPO_ACCESS_TOKEN}` } : {}) }, body: JSON.stringify(rows.results.map((row) => ({ to: row.push_token, title, body, sound: 'default', channelId: 'default', priority: 'high', ttl: 3600 }))) });
   const payload = await result.json().catch(() => ({ error: 'Invalid response from Expo push service' }));
   if (!result.ok) return { registeredDevices: rows.results.length, error: `Expo push HTTP ${result.status}`, details: payload };
   return { registeredDevices: rows.results.length, tickets: payload };
